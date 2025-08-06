@@ -1,6 +1,5 @@
 import pandas as pd
 from src.common.db_connection import DatabaseConnector
-from sqlalchemy import text
 
 
 
@@ -30,3 +29,4 @@ date_dim["day_name"] = date_dim["date"].dt.day_name()
 date_dim["month_name"] = date_dim["date"].dt.month_name()
 
 date_dim.to_sql('dim_dates', con=engine, if_exists='replace', index=False)
+
