@@ -7,8 +7,7 @@ from dotenv import load_dotenv
 
 class DatabaseConnector:
     def __init__(self):
-        dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__),  '..', '..', '.env'))
-        load_dotenv(dotenv_path=dotenv_path)
+        load_dotenv()
         server = os.getenv("DB_SERVER")
         database = os.getenv("DB_NAME")
         username = os.getenv("DB_USER")

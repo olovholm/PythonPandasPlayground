@@ -1,10 +1,18 @@
+import sys
+sys.path.append('/opt/airflow/src')
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
 
+from us_border_crossings.load_data import load_data
+
+
+
 # Define Python functions for tasks
 def task_one():
-    print("Task one executed")
+    print("Going to load data")
+    load_data()
 
 def task_two():
     print("Task two executed")
