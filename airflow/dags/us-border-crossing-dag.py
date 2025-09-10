@@ -9,15 +9,6 @@ from us_border_crossings.load_data import load_data
 from us_border_crossings.unload_data import unload_data
 
 
-
-# Define Python functions for tasks
-def task_one():
-    print("Going to load data")
-    load_data()
-
-def task_two():
-    print("Task two executed")
-
 # Define the DAG
 default_args = {
     'owner': 'airflow',

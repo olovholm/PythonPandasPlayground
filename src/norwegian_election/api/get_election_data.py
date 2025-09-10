@@ -57,50 +57,43 @@ def save_municipality_data(year, county_nr, muni_nr, data):
     print(f"Saved municipality data for year {year}, county {county_nr}, municipality {muni_nr} to {out_path}")
 
 
+def load_election_data():
+
+    election_urls = get_election_urls()
+    county_links = list()
+    municipality_links = list()
 
 
-election_urls = get_election_urls()
-county_links = list()
+    for election_url in election_urls:
+        print("Fetching election data from:", election_url)
+        year_data_resp = requests.get(election_url)
+        year_data = year_data_resp.json()
 
-election_metadata = []
+        year = year_data["id"]["valgaar"]
+        save_election_data(year, year_data)
+        county_links.append({"year": year, "links": get_related_links(year_data)})
 
-for election_url in election_urls:
-    print("Fetching election data from:", election_url)
-    year_data_resp = requests.get(election_url)
-    year_data = year_data_resp.json()
+    for element in county_links:
+        print(f"Fetching county data from: {element['year']}")
+        for link in element["links"]:
+            county_resp = requests.get(link)
+            if county_resp.status_code == 200:
+                county_data = county_resp.json()
+                year = county_data["id"]["valgaar"]
+                county_nr = county_data["id"]["nr"]
+                save_countydata(year, link, county_data)
+                municipality_links.append({"year": year, "county_id": county_nr, "links" : get_related_links(county_data)})
+            else:
+                print(f"Failed to download {link}")
 
-    year = year_data["id"]["valgaar"]
-    save_election_data(year, year_data)
-    county_links.append({"year": year, "links": get_related_links(year_data)})
-
-
-
- # Replace with the actual base URL
-municipality_links = list()
-
-for element in county_links:
-    print(f"Fetching county data from: {element["year"]}")
-    for link in element["links"]:
-        county_resp = requests.get(link)
-        if county_resp.status_code == 200:
-            county_data = county_resp.json()
-            year = county_data["id"]["valgaar"]
-            county_nr = county_data["id"]["nr"]
-            year_dir = os.path.join(DATA_DIR, str(year))
-            save_countydata(year, link, county_data)
-            municipality_links.append({"year": year, "county_id": county_nr, "links" : get_related_links(county_data)})
-        else:
-            print(f"Failed to download {link}")
-
-
-for element in municipality_links:
-    print(f"Fetching municipality data from: {element['year']} for county {element['county_id']}")
-    for link in element["links"]:
-        muni_resp = requests.get(link)
-        if muni_resp.status_code == 200:
-            muni_data = muni_resp.json()
-            year = muni_data["id"]["valgaar"]
-            muni_nr = muni_data["id"]["nr"]
-            save_municipality_data(year, element['county_id'], muni_nr, muni_data)
-        else:
-            print(f"Failed to download {link}")
+    for element in municipality_links:
+        print(f"Fetching municipality data from: {element['year']} for county {element['county_id']}")
+        for link in element["links"]:
+            muni_resp = requests.get(link)
+            if muni_resp.status_code == 200:
+                muni_data = muni_resp.json()
+                year = muni_data["id"]["valgaar"]
+                muni_nr = muni_data["id"]["nr"]
+                save_municipality_data(year, element['county_id'], muni_nr, muni_data)
+            else:
+                print(f"Failed to download {link}")
