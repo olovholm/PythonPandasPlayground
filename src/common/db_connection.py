@@ -12,6 +12,17 @@ class DatabaseConnector:
         database = os.getenv("DB_NAME")
         username = os.getenv("DB_USER")
         password = os.getenv("DB_PASSWORD")
+
+        missing = [var for var, val in {
+            "DB_SERVER": server,
+            "DB_NAME": database,
+            "DB_USER": username,
+            "DB_PASSWORD": password
+        }.items() if val is None]
+
+        if missing:
+            raise ValueError(f"Missing environment variables: {', '.join(missing)}")
+
         connection_string = (
             f"postgresql+psycopg2://{username}:{password}@{server}/{database}"
         )

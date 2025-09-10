@@ -6,6 +6,7 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 
 from us_border_crossings.load_data import load_data
+from us_border_crossings.unload_data import unload_data
 
 
 
@@ -33,13 +34,13 @@ with DAG(
         catchup=False,
 ) as dag:
     task_1 = PythonOperator(
-        task_id='task_one',
-        python_callable=task_one,
+        task_id='load_raw_data',
+        python_callable=load_data
     )
 
     task_2 = PythonOperator(
-        task_id='task_two',
-        python_callable=task_two,
+        task_id='unload_data',
+        python_callable=unload_data,
     )
 
     task_1 >> task_2  # Define task dependencies
